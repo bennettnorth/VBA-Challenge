@@ -1,0 +1,162 @@
+Attribute VB_Name = "Module1"
+Sub StockAnalysis()
+
+'Establish necessary variables
+Dim ticker As String
+Dim yearChange As Double
+Dim percentChange As Double
+Dim totalVolume As Double
+Dim summaryRow As Integer
+Dim iterator As Integer
+Dim GreatestIncrease As Double
+Dim GreatestDecrease As Double
+Dim GreatestVolume As Double
+Dim GreatestIncreaseTicker As String
+Dim GreatestDecreaseTicker As String
+Dim GreatestVolumeTicker As String
+Dim OpenPrice As Double
+
+iterator = Application.Worksheets.Count
+
+'Loop Through Worksheets
+
+For x = 1 To iterator
+
+Worksheets(x).Activate
+
+
+
+summaryRow = 2
+OpenPrice = Cells(2, 3).Value
+
+'Loop through all rows within sheet
+
+For i = 2 To Cells(Rows.Count, 1).End(xlUp).Row
+
+'Evaluate if there's a change in the Ticker
+
+If Cells(i, 1).Value <> Cells(i + 1, 1).Value Then
+
+
+    ticker = Cells(i, 1).Value
+    yearChange = Cells(i, 6).Value - OpenPrice
+    percentChange = yearChange / OpenPrice
+    totalVolume = totalVolume + Cells(i, 7).Value
+    
+    Cells(summaryRow, 9).Value = ticker
+    Cells(summaryRow, 10).Value = yearChange
+    Cells(summaryRow, 11).Value = percentChange
+    Cells(summaryRow, 11).NumberFormat = "0.00%"
+    Cells(summaryRow, 12).Value = totalVolume
+    Cells(summaryRow, 12).NumberFormat = "#,000"
+    
+    'Set color to red if percentchange negative
+    
+    If (percentChange < 0) Then
+    
+    Cells(summaryRow, 11).Interior.Color = RGB(250, 0, 0)
+    End If
+    
+    
+    ' Set color to Green if percentchange Positive
+    
+    If (percentChange > 0) Then
+    
+    Cells(summaryRow, 11).Interior.Color = RGB(0, 255, 0)
+    End If
+    
+    'Set color to red if yearchange negative
+    
+    If (yearChange < 0) Then
+    
+    Cells(summaryRow, 10).Interior.Color = RGB(250, 0, 0)
+    End If
+    
+    
+    ' Set color to Green if yearchange Positive
+    
+    If (yearChange > 0) Then
+    
+    Cells(summaryRow, 10).Interior.Color = RGB(0, 255, 0)
+    End If
+    
+    
+    
+    
+    
+    'Analyze Highest Volume
+    If (totalVolume > GreatestVolume) Then
+    
+    GreatestVolume = totalVolume
+    GreatestVolumeTicker = ticker
+   End If
+   
+       'Analyze Highest Increase
+    If (percentChange > GreatestIncrease) Then
+        GreatestIncrease = percentChange
+        GreatestIncreaseTicker = ticker
+    End If
+    
+       'Analyze Highest Decrease
+    If (percentChange < GreatestDecrease) Then
+        GreatestDecrease = percentChange
+        GreatestDecreaseTicker = ticker
+    End If
+
+    OpenPrice = Cells(i + 1, 3).Value
+    
+    summaryRow = summaryRow + 1
+
+    totalVolume = 0
+    
+Else
+    
+    totalVolume = totalVolume + Cells(i, 7).Value
+
+End If
+Next i
+
+'Name Summary output fields
+
+    Range("I1").Value = "Ticker"
+    Range("J1").Value = "Yearly Change"
+    Range("K1").Value = "Percent Change"
+    Range("L1").Value = "Total Stock Volume"
+
+'Name Greatest output fields
+
+    Range("O3").Value = "Greatest % Increase"
+    Range("O4").Value = "Greatest % Decrease"
+    Range("O5").Value = "Greatest Total Volume"
+    Range("P1").Value = "Ticker"
+    Range("Q1").Value = "Value"
+
+'Output Highest Volume
+   
+    Cells(5, 17).Value = GreatestVolume
+    Cells(5, 16).Value = GreatestVolumeTicker
+    
+'Output Highest Increase
+      
+    Cells(3, 17).Value = GreatestIncrease
+    Cells(3, 17).NumberFormat = "0.00%"
+    Cells(3, 16).Value = GreatestIncreaseTicker
+      
+'Output Highest Decrease
+   
+    Cells(4, 17).Value = GreatestDecrease
+    Cells(4, 17).NumberFormat = "0.00%"
+    Cells(4, 16).Value = GreatestDecreaseTicker
+    
+ totalVolume = 0
+ percentChange = 0
+ yearChange = 0
+ GreatestVolume = 0
+ GreatestIncrease = 0
+ GreatestDecrease = 0
+ 
+
+'Sheet Iterator
+Next
+
+End Sub
